@@ -14,8 +14,9 @@ Quotes.prototype.readQuotes = function() {
         jQuery: {
             name: 'cheerio',
             options: {
-                normalizeWhitespace: true,
-                xmlMode: true
+                normalizeWhitespace: false,
+                xmlMode: false,
+                decodeEntities: true
             }
         },
         callback: function(error, result, $) {
@@ -23,11 +24,13 @@ Quotes.prototype.readQuotes = function() {
                 console.log('Возникла ошибка: ', error);
                 return;
             };
+            var t = $('body').html();
+            t = t.replace(/<br>/ig, '\n');
+            $('body').html(t);
             $(conf.selector).each(function(k, v) {
                 list[k] = $(v).text();
             });
             fs.writeFileSync('./quotes.json', JSON.stringify(list));
-            console.log('list ', list);
             return;
         }
     });

@@ -1,32 +1,47 @@
-var telegramBot = require('node-telegram-bot-api');
+var telegramBot = require('node-telegram-bot-api'),
+    nconf = require('nconf'),
+    Quotes = require('./bashim/index.js');
 var token = '206854238:AAHjJ2ZRFTB13L1bEM_zmh27upY_XYgyM14';
-var Quotes = require('./bashim/index.js');
 
 var bot = new telegramBot(token, {polling: true});
 
 var quotes = new Quotes.Quotes();
-var count = 0;
-var haveQuotes = false;
+
+// загрузка настрек
+nconf.use('file', { file: './config/config.json'});
+nconf.load();
+var config = {
+    'count': nconf.get('count'),
+    'haveQuotes': nconf.get('haveQuotes')
+}
 
 console.log('Started bot!');
 bot.on('message', function (msg) {
     var chatId = msg.chat.id;
     var quoteMsg = 'Пусто';
-    console.log(msg);
-    if(msg.text == 'update' && haveQuotes == false) {
+    msg.text = msg.text.replace(/\s+/g, '').toLowerCase();
+    console.log('команда ', msg.text);
+    if(msg.text == 'update' && config.haveQuotes == false) {
         quotes.readQuotes();
         console.log('Получаем цитат...');
         bot.sendMessage(chatId, 'Получаем цитаты...');
-        haveQuotes = true;
+        config.haveQuotes = true;
+        nconf.set('haveQuotes', true);
+        nconf.save();
+        return;
     } else {
-        if (haveQuotes) {
+        if (config.haveQuotes) {
             var list = require('./quotes.json');
-            if (count > list.length) {
+            if (config.count > list.length) {
                 quoteMsg = 'Циататы закончились!'
-                count = 0;
+                config.count = 0;
+                nconf.set('count', 0);
+                nconf.save();
             } else {
-                quoteMsg = list[count];
-                count = count+1;
+                quoteMsg = list[config.count];
+                config.count = config.count+1;
+                nconf.set('count', config.count);
+                nconf.save();
             }
             bot.sendMessage(chatId, quoteMsg);
         }

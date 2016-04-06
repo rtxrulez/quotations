@@ -9,6 +9,9 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
-    "node-telegram-bot-api": "^0.21.1"
+    "jsonfile": "^2.2.3",
+    "nconf": "^0.8.4",
+    "node-telegram-bot-api": "^0.21.1",
+    "util": "^0.10.3"
   }
 }
