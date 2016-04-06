@@ -1,6 +1,7 @@
 var telegramBot = require('node-telegram-bot-api'),
     nconf = require('nconf'),
     Quotes = require('./bashim/index.js');
+require('shelljs/global');
 var token = '206854238:AAHjJ2ZRFTB13L1bEM_zmh27upY_XYgyM14';
 
 var bot = new telegramBot(token, {polling: true});
@@ -13,6 +14,9 @@ nconf.load();
 var config = {
     'count': nconf.get('count'),
     'haveQuotes': nconf.get('haveQuotes')
+};
+var users = {
+    user: ['', '']
 }
 
 console.log('Started bot!');
@@ -20,7 +24,13 @@ bot.on('message', function (msg) {
     var chatId = msg.chat.id;
     var quoteMsg = 'Пусто';
     msg.text = msg.text.replace(/\s+/g, '').toLowerCase();
-    console.log('команда ', msg.text);
+    console.log('команда ', msg);
+    if(msg.text == 'reboot') {
+        bot.sendMessage(chatId, 'Мы перезагружаем комп!');
+        echo('is reboot!');
+        reboot;
+        return false;
+    }
     if(msg.text == 'update' && config.haveQuotes == false) {
         quotes.readQuotes();
         console.log('Получаем цитат...');
